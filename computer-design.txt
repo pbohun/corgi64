@@ -1,0 +1,22 @@
+General Design 
+
+-----------------------------------------
+CPU
+-----------------------------------------
+The cpu will connect to memory.
+
+-----------------------------------------
+GRAPHICS/DISPLAY
+-----------------------------------------
+Connects to memory and simulates a monitor and also provides graphics acceleration.
+
+-----------------------------------------
+IO/DEVICES
+-----------------------------------------
+Connects to memory and deals with interface to io devices such as mouse, keyboard, controllers, printers, etc.
+For implementation reasons, this will likely be tightly coupled with the graphics module.
+
+-----------------------------------------
+STORAGE
+-----------------------------------------
+Connects to memory and provides all functionality of a file system.
