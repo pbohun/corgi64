@@ -6,14 +6,11 @@ using byte = uint8_t;
 using i64 = int64_t;
 
 struct cpu {
-    i64 a, b, pc, sp, status;
+    i64 a, b, c, pc, sp, status;
     byte *mem;
 };
 
 static void nop(cpu *c) {}
-
-// table of addressing modes
-static void (*addrtable[256])(cpu*) = {};
 
 // table of opcodes
 static void (*optable[256])(cpu*) = {
@@ -50,6 +47,6 @@ void run(cpu *c) {
 }
 
 int main() {
-
+    printf("testing main");
     return 0;
 }
