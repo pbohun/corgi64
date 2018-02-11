@@ -1,40 +1,66 @@
 #include <cstdint>
 
+#define local static
+
 using byte = uint8_t;
 using i64 = int64_t;
 
+struct instruction {
+    byte opcode;
+    i64 value;
+};
+
 struct cpu {
     i64 a, b, c, pc, sp, flags;
+    instruction *instr;
+    bool running;
     byte *mem;
 };
 
-static void nop(cpu *c) {}
+local void nop(cpu *c) {}
+
+local void hlt(cpu *c) {
+    c->running = false;
+}
 
 // NOTE (phil): remember to set flags after doing arithmetic
-static void add(cpu *c) {
+local void add(cpu *c) {
     c->a = c->a + c->b;
 }
 
-static void sub(cpu *c) {
+local void sub(cpu *c) {
     c->a = c->a - c->b;
 }
 
-static void mul(cpu *c) {
+local void mul(cpu *c) {
     c->a = c->a * c->b;
 }
 
-static void div(cpu *c) {
+local void div(cpu *c) {
     c->a = c->a / c->b;
 }
 
-static void mod(cpu *c) {
+local void mod(cpu *c) {
     c->a = c->a % c->b;
 }
 
+// register opcodes
+local void sia(cpu *c) {
+    c->a = c->instr->value;
+}
+
+local void sib(cpu *c) {
+    c->b = c->instr->value;
+}
+
+local void sic(cpu *c) {
+    c->c = c->instr->value;
+}
+
 // table of opcodes
-static void (*optable[256])(cpu*) = {
+local void (*optable[256])(cpu*) = {
 /*      | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | A | B | C | D | E | F |      */
-/* 0 */  nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop, /* 0 */
+/* 0 */  nop,sia,sib,sic,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop, /* 0 */
 /* 1 */  nop,nop,nop,nop,nop,nop,add,sub,mul,div,mod,nop,nop,nop,nop,nop, /* 1 */
 /* 2 */  nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop, /* 2 */
 /* 3 */  nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop, /* 3 */
@@ -52,15 +78,35 @@ static void (*optable[256])(cpu*) = {
 /* F */  nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop, /* F */
 };
 
-void reset(cpu *c) {
+void cpu_init(cpu *c) {
     c->a = 0;
     c->b = 0;
     c->pc = 0;
     c->sp = 0;
     c->flags = 0;
     c->mem = NULL;
+    c->instr = (instruction*)malloc(sizeof(instruction));
+}
+
+void reset(cpu *c) {
+    c->a = 0;
+    c->b = 0;
+    c->pc = 0;
+    c->sp = 0;
+    c->flags = 0;
+    if (c->instr == NULL) {
+        c->instr = (instruction*)malloc(sizeof(instruction));
+    }
 }
 
 void run(cpu *c) {
-
+    c->running = true;
+    while(c->running) {
+        // fetch and decode
+        c->instr = (instruction*)(c->mem + c->pc);
+        // increment the program counter
+        c->pc++; 
+        // execute
+        optable[c->instr->opcode](c);
+    }
 }

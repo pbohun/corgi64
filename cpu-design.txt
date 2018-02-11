@@ -65,5 +65,6 @@ Instructions Summary
 0x2B |  JMP  | Unconditional jump
 0x2C |  INT  | Interrupt
 0X2D |  NOP  | No operation
+0X2E |  HLT  | Halt operation
 
 Instruction Details 
