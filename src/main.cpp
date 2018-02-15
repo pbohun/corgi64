@@ -13,7 +13,7 @@ int main() {
 
     run(c);
 
-    printf("register a should be 7, and is:", (int64_t)c->a);
+    printf("register a should be 7, and is: %lld", (int64_t)c->a);
 
     return 0;
 }
