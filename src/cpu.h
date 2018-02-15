@@ -109,7 +109,7 @@ void run(cpu *c) {
     c->running = true;
     while(c->running) {
         // fetch and decode
-        c->instr = (instruction*)(c->mem + c->pc);
+        // c->instr = (instruction*)(c->mem + c->pc);
         // increment the program counter
         c->pc++;
         // execute
