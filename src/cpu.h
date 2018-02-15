@@ -117,7 +117,14 @@ void run(cpu *c) {
     c->running = true;
     while(c->running) {
         // fetch and decode
-        // c->instr = (instruction*)(c->mem + c->pc);
+        c->instr=(instruction*)malloc(sizeof(instruction));
+        c->instr->opcode=c->mem[c->pc];
+        c->instr->value=*((i64*)(c->mem+c->pc+1));
+        c->instr->value=endian_swap(c->instr->value);
+
+		// just for debugging info
+        printf("instruction 0x%02X: value is %lld\n",(int)c->instr->opcode,(int64_t)c->instr->value);
+
         // increment the program counter
         c->pc++;
         // execute
