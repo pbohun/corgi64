@@ -47,14 +47,20 @@ local void mod(cpu *c) {
 // register opcodes
 local void sia(cpu *c) {
     c->a = c->instr->value;
+    // skip immediate value
+    c->pc+=4;
 }
 
 local void sib(cpu *c) {
     c->b = c->instr->value;
+    // skip immediate value
+    c->pc+=4;
 }
 
 local void sic(cpu *c) {
     c->c = c->instr->value;
+    // skip immediate value
+    c->pc+=4;
 }
 
 // table of opcodes
