@@ -48,19 +48,19 @@ local void mod(cpu *c) {
 local void sia(cpu *c) {
     c->a = c->instr->value;
     // skip immediate value
-    c->pc+=4;
+    c->pc+=sizeof(i64);
 }
 
 local void sib(cpu *c) {
     c->b = c->instr->value;
     // skip immediate value
-    c->pc+=4;
+    c->pc+=sizeof(i64);
 }
 
 local void sic(cpu *c) {
     c->c = c->instr->value;
     // skip immediate value
-    c->pc+=4;
+    c->pc+=sizeof(i64);
 }
 
 // table of opcodes
