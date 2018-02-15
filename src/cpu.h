@@ -111,7 +111,7 @@ void run(cpu *c) {
         // fetch and decode
         c->instr = (instruction*)(c->mem + c->pc);
         // increment the program counter
-        c->pc++; 
+        c->pc++;
         // execute
         optable[c->instr->opcode](c);
     }
