@@ -106,6 +106,7 @@ void cpu_init(cpu *c) {
 void reset(cpu *c) {
     c->a = 0;
     c->b = 0;
+    c->c = 0;
     c->pc = 0;
     c->sp = 0;
     c->flags = 0;
