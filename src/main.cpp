@@ -4,6 +4,10 @@
 #include <vector>
 #include "cpu.h"
 
+void stackdump(cpu *c){
+    printf("registers\n\tA %lld\n\tB %lld\n\tC %lld",(int64_t)c->a,(int64_t)c->b,(int64_t)c->c);
+}
+
 int main() {
     cpu *c = (cpu*)malloc(sizeof(cpu));
     cpu_init(c);
@@ -13,7 +17,7 @@ int main() {
 
     run(c);
 
-    printf("register a should be 7, and is: %lld", (int64_t)c->a);
+    stackdump(c);
 
     return 0;
 }
