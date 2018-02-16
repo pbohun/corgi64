@@ -95,6 +95,7 @@ local void (*optable[256])(cpu*) = {
 void cpu_init(cpu *c) {
     c->a = 0;
     c->b = 0;
+    c->c = 0;
     c->pc = 0;
     c->sp = 0;
     c->flags = 0;
