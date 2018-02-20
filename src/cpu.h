@@ -17,6 +17,16 @@ struct cpu {
     byte *mem;
 };
 
+void cpu_fetch(cpu *c) {
+    c->instr->opcode = *(c->mem + c->pc);
+    c->instr->value = *(i64*)(c->mem + c->pc + 1);
+}
+
+void cpu_print_status(cpu *c) {
+    printf("a: %lld\nb: %lld\nc: %lld\npc: %lld\nsp: %lld\nflags: %lld\n",
+        c->a, c->b, c->c, c->pc, c->sp, c->flags);
+}
+
 local void nop(cpu *c) {}
 
 local void hlt(cpu *c) {
@@ -62,7 +72,7 @@ local void (*optable[256])(cpu*) = {
 /*      | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | A | B | C | D | E | F |      */
 /* 0 */  nop,sia,sib,sic,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop, /* 0 */
 /* 1 */  nop,nop,nop,nop,nop,nop,add,sub,mul,div,mod,nop,nop,nop,nop,nop, /* 1 */
-/* 2 */  nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop, /* 2 */
+/* 2 */  nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,hlt,nop, /* 2 */
 /* 3 */  nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop, /* 3 */
 /* 4 */  nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop, /* 4 */
 /* 5 */  nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop, /* 5 */
@@ -78,9 +88,31 @@ local void (*optable[256])(cpu*) = {
 /* F */  nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop, /* F */
 };
 
+// table of memory offsets
+i64 offset_table[256] = {
+/*      | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | A | B | C | D | E | F |      */
+/* 0 */    1,  9,  9,  9,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* 0 */
+/* 1 */    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* 1 */
+/* 2 */    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* 2 */
+/* 3 */    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* 3 */
+/* 4 */    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* 4 */
+/* 5 */    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* 5 */
+/* 6 */    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* 6 */
+/* 7 */    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* 7 */
+/* 8 */    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* 8 */
+/* 9 */    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* 9 */
+/* A */    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* A */
+/* B */    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* B */
+/* C */    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* C */
+/* D */    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* D */
+/* E */    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* E */
+/* F */    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* F */
+};
+
 void cpu_init(cpu *c) {
     c->a = 0;
     c->b = 0;
+    c->c = 0;
     c->pc = 0;
     c->sp = 0;
     c->flags = 0;
@@ -91,6 +123,7 @@ void cpu_init(cpu *c) {
 void reset(cpu *c) {
     c->a = 0;
     c->b = 0;
+    c->c = 0;
     c->pc = 0;
     c->sp = 0;
     c->flags = 0;
@@ -103,9 +136,9 @@ void run(cpu *c) {
     c->running = true;
     while(c->running) {
         // fetch and decode
-        c->instr = (instruction*)(c->mem + c->pc);
+        cpu_fetch(c);
         // increment the program counter
-        c->pc++; 
+        c->pc += offset_table[c->instr->opcode];
         // execute
         optable[c->instr->opcode](c);
     }
