@@ -1,7 +1,5 @@
 #include <cstdint>
 
-#define local static
-
 using byte = uint8_t;
 using i64 = int64_t;
 
@@ -27,48 +25,61 @@ void cpu_print_status(cpu *c) {
         c->a, c->b, c->c, c->pc, c->sp, c->flags);
 }
 
-local void nop(cpu *c) {}
+void nop(cpu *c) {}
 
-local void hlt(cpu *c) {
+void hlt(cpu *c) {
     c->running = false;
 }
 
 // NOTE (phil): remember to set flags after doing arithmetic
-local void add(cpu *c) {
+void add(cpu *c) {
     c->a = c->a + c->b;
 }
 
-local void sub(cpu *c) {
+void sub(cpu *c) {
     c->a = c->a - c->b;
 }
 
-local void mul(cpu *c) {
+void mul(cpu *c) {
     c->a = c->a * c->b;
 }
 
-local void div(cpu *c) {
+void div(cpu *c) {
     c->a = c->a / c->b;
 }
 
-local void mod(cpu *c) {
+void mod(cpu *c) {
     c->a = c->a % c->b;
 }
 
 // register opcodes
-local void sia(cpu *c) {
+void sia(cpu *c) {
     c->a = c->instr->value;
 }
 
-local void sib(cpu *c) {
+void sib(cpu *c) {
     c->b = c->instr->value;
 }
 
-local void sic(cpu *c) {
+void sic(cpu *c) {
     c->c = c->instr->value;
 }
 
+// memory opcodes
+void lda(cpu *c) {
+    c->a = *(i64*)(c->mem + c->instr->value);
+}
+
+void ldb(cpu *c) {
+    c->b = *(i64*)(c->mem + c->instr->value);
+}
+
+void ldc(cpu *c) {
+    c->c = *(i64*)(c->mem + c->instr->value);
+}
+
 // table of opcodes
-local void (*optable[256])(cpu*) = {
+void (*optable[256])(cpu*) = {
 /*      | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | A | B | C | D | E | F |      */
 /* 0 */  nop,sia,sib,sic,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop, /* 0 */
 /* 1 */  nop,nop,nop,nop,nop,nop,add,sub,mul,div,mod,nop,nop,nop,nop,nop, /* 1 */

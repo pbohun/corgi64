@@ -6,6 +6,8 @@ What if you had a computer that had the simplicity of the Commodore 64 with the 
 
 That's the idea and purpose behind the Corgi64 project, to provide a simple, modular, and compact simulated computer system that allows people to learn more about computers. 
 
+NOTE: This is a work in progress, it is not yet finished or fully functioning yet. Please look at the videos linked below to take a look at the progress.
+
 I have a video series detailing my efforts writing Corgi64: https://www.youtube.com/watch?v=EhO5W6y3BWc&list=PLSiFUSQSRYAND5ETcWAkiD5tBxM-kZGLD
 
 ## System Requirements
