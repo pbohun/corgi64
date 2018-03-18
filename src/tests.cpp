@@ -99,6 +99,30 @@ void test_ldc(cpu *c) {
     cpu_print_status(c);
 }
 
+void test_sta(cpu *c) {
+    c->a = 128;
+    c->instr->value = 16;
+    sta(c);
+    assert(128 == *(i64*)(c->mem + 16));
+    cpu_print_status(c);
+}
+
+void test_stb(cpu *c) {
+    c->b = 512;
+    c->instr->value = 16;
+    stb(c);
+    assert(512 == *(i64*)(c->mem + 16));
+    cpu_print_status(c);
+}
+
+void test_stc(cpu *c) {
+    c->c = 1024;
+    c->instr->value = 16;
+    stc(c);
+    assert(1024 == *(i64*)(c->mem + 16));
+    cpu_print_status(c);
+}
+
 int main() {
     cpu *c = (cpu*)malloc(sizeof(cpu));
     cpu_init(c);
@@ -120,6 +144,9 @@ int main() {
     test_lda(c);
     test_ldb(c);
     test_ldc(c);
+    test_sta(c);
+    test_stb(c);
+    test_stc(c);
 
     printf("all test passed");
 

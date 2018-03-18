@@ -78,10 +78,22 @@ void ldc(cpu *c) {
     c->c = *(i64*)(c->mem + c->instr->value);
 }
 
+void sta(cpu *c) {
+    *(i64*)(c->mem + c->instr->value) = c->a;
+}
+
+void stb(cpu *c) {
+    *(i64*)(c->mem + c->instr->value) = c->b;
+}
+
+void stc(cpu *c) {
+    *(i64*)(c->mem + c->instr->value) = c->c;
+}
+
 // table of opcodes
 void (*optable[256])(cpu*) = {
 /*      | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | A | B | C | D | E | F |      */
-/* 0 */  nop,sia,sib,sic,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop, /* 0 */
+/* 0 */  nop,sia,sib,sic,lda,ldb,ldc,sta,stb,stc,nop,nop,nop,nop,nop,nop, /* 0 */
 /* 1 */  nop,nop,nop,nop,nop,nop,add,sub,mul,div,mod,nop,nop,nop,nop,nop, /* 1 */
 /* 2 */  nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,hlt,nop, /* 2 */
 /* 3 */  nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop, /* 3 */
