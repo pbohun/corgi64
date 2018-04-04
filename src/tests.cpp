@@ -1,3 +1,12 @@
+/*
+Copyright (C) 2018 Philip Bohun
+
+This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+*/
 #include <cstdio>
 #include <cstdlib>
 #include <cassert>
@@ -68,6 +77,24 @@ void test_sic(cpu *c) {
     c->instr->value = 5;
     sic(c);
     assert(c->c == 5);
+    cpu_print_status(c);
+}
+
+void test_zero_flag(cpu *c) {
+    reset(c);
+    c->a = 0;
+    c->b = 0;
+    sub(c);
+    assert(c->flags == 1);
+    cpu_print_status(c);
+}
+
+void test_negative_flag(cpu *c) {
+    reset(c);
+    c->a = 0;
+    c->b = 1;
+    sub(c);
+    assert(c->flags == 2);
     cpu_print_status(c);
 }
 
@@ -147,6 +174,9 @@ int main() {
     test_sta(c);
     test_stb(c);
     test_stc(c);
+    // test flags 
+    test_zero_flag(c);
+    test_negative_flag(c);
 
     printf("all test passed");
 
