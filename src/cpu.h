@@ -34,14 +34,18 @@ void cpu_print_status(cpu *c) {
         c->a, c->b, c->c, c->pc, c->sp, c->flags);
 }
 
+i64 get_flag_value(cpu *c, int flag_index) {
+    i64 mask = 1 << flag_index;
+    return (c->flags & mask) >> flag_index;
+}
+
 void nop(cpu *c) {}
 
 void hlt(cpu *c) {
     c->running = false;
 }
 
-// TODO: (phil) change name to have underscores
-void setArithmeticFlag(cpu *c) {
+void set_arithmetic_flag(cpu *c) {
     if (c->a == 0) {
         c->flags |= 1;
     } else if (c->a < 0) {
@@ -53,27 +57,27 @@ void setArithmeticFlag(cpu *c) {
 
 void add(cpu *c) {
     c->a = c->a + c->b;
-    setArithmeticFlag(c);
+    set_arithmetic_flag(c);
 }
 
 void sub(cpu *c) {
     c->a = c->a - c->b;
-    setArithmeticFlag(c);
+    set_arithmetic_flag(c);
 }
 
 void mul(cpu *c) {
     c->a = c->a * c->b;
-    setArithmeticFlag(c);
+    set_arithmetic_flag(c);
 }
 
 void div(cpu *c) {
     c->a = c->a / c->b;
-    setArithmeticFlag(c);
+    set_arithmetic_flag(c);
 }
 
 void mod(cpu *c) {
     c->a = c->a % c->b;
-    setArithmeticFlag(c);
+    set_arithmetic_flag(c);
 }
 
 // register opcodes
@@ -114,12 +118,23 @@ void stc(cpu *c) {
     *(i64*)(c->mem + c->instr->value) = c->c;
 }
 
+// jump opcodes 
+void jmp(cpu *c) {
+    c->pc = c->instr->value;
+}
+
+void beq(cpu *c) {
+    if (get_flag_value(c, 0) == 1) {
+        c->pc = c->instr->value;
+    }
+}
+
 // table of opcodes
 void (*optable[256])(cpu*) = {
 /*      | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | A | B | C | D | E | F |      */
 /* 0 */  nop,sia,sib,sic,lda,ldb,ldc,sta,stb,stc,nop,nop,nop,nop,nop,nop, /* 0 */
 /* 1 */  nop,nop,nop,nop,nop,nop,add,sub,mul,div,mod,nop,nop,nop,nop,nop, /* 1 */
-/* 2 */  nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,hlt,nop, /* 2 */
+/* 2 */  nop,nop,nop,nop,beq,nop,nop,nop,nop,nop,nop,jmp,nop,nop,hlt,nop, /* 2 */
 /* 3 */  nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop, /* 3 */
 /* 4 */  nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop, /* 4 */
 /* 5 */  nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop, /* 5 */
@@ -140,7 +155,7 @@ i64 offset_table[256] = {
 /*      | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | A | B | C | D | E | F |      */
 /* 0 */    1,  9,  9,  9,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* 0 */
 /* 1 */    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* 1 */
-/* 2 */    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* 2 */
+/* 2 */    1,  1,  1,  1,  9,  1,  1,  1,  1,  1,  1,  9,  1,  1,  1,  1, /* 2 */
 /* 3 */    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* 3 */
 /* 4 */    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* 4 */
 /* 5 */    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* 5 */

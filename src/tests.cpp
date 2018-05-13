@@ -12,6 +12,14 @@ You should have received a copy of the GNU General Public License along with thi
 #include <cassert>
 #include "cpu.h"
 
+void test_get_flag_value(cpu *c) {
+    reset(c);
+    c->flags = 2;
+    i64 value = get_flag_value(c, 1);
+    assert(1 == value);
+    cpu_print_status(c);
+}
+
 void test_hlt(cpu *c) {
     c->running = true;
     hlt(c);
@@ -150,11 +158,33 @@ void test_stc(cpu *c) {
     cpu_print_status(c);
 }
 
+// tests for branching
+void test_jmp(cpu *c) {
+    reset(c);
+    c->instr->value = 30;
+    c->pc = 1;
+    jmp(c);
+    assert(30 == c->instr->value);
+    cpu_print_status(c);
+}
+
+void test_beq(cpu *c) {
+    reset(c);
+    c->instr->value = 10;
+    c->flags = 1;
+    c->pc = 5;
+    beq(c);
+    assert(10 == c->pc);
+    cpu_print_status(c);
+}
+
 int main() {
     cpu *c = (cpu*)malloc(sizeof(cpu));
     cpu_init(c);
     byte memory[32] = {0};
     c->mem = memory;
+    // test get flag value
+    test_get_flag_value(c);
     // misc tests 
     test_hlt(c);
     // test arithmetic
@@ -177,7 +207,9 @@ int main() {
     // test flags 
     test_zero_flag(c);
     test_negative_flag(c);
-
+    // test jump opcodes
+    test_jmp(c);
+    test_beq(c);
     printf("all test passed");
 
     return 0;
