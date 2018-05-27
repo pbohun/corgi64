@@ -129,12 +129,30 @@ void beq(cpu *c) {
     }
 }
 
+void bnz(cpu *c) {
+    if (get_flag_value(c, 0) == 0) {
+        c->pc = c->instr->value;
+    }
+}
+
+void bgt(cpu *c) {
+    if (get_flag_value(c, 1) == 0) {
+        c->pc = c->instr->value;
+    }
+}
+
+void blz(cpu *c) {
+    if (get_flag_value(c, 1) == 1) {
+        c->pc = c->instr->value;
+    }
+}
+
 // table of opcodes
 void (*optable[256])(cpu*) = {
 /*      | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | A | B | C | D | E | F |      */
 /* 0 */  nop,sia,sib,sic,lda,ldb,ldc,sta,stb,stc,nop,nop,nop,nop,nop,nop, /* 0 */
 /* 1 */  nop,nop,nop,nop,nop,nop,add,sub,mul,div,mod,nop,nop,nop,nop,nop, /* 1 */
-/* 2 */  nop,nop,nop,nop,beq,nop,nop,nop,nop,nop,nop,jmp,nop,nop,hlt,nop, /* 2 */
+/* 2 */  nop,nop,nop,nop,beq,nop,bgt,blz,nop,nop,nop,jmp,nop,nop,hlt,nop, /* 2 */
 /* 3 */  nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop, /* 3 */
 /* 4 */  nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop, /* 4 */
 /* 5 */  nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop, /* 5 */
@@ -155,7 +173,7 @@ i64 offset_table[256] = {
 /*      | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | A | B | C | D | E | F |      */
 /* 0 */    1,  9,  9,  9,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* 0 */
 /* 1 */    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* 1 */
-/* 2 */    1,  1,  1,  1,  9,  1,  1,  1,  1,  1,  1,  9,  1,  1,  1,  1, /* 2 */
+/* 2 */    1,  1,  1,  1,  9,  1,  9,  9,  1,  1,  1,  9,  1,  1,  1,  1, /* 2 */
 /* 3 */    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* 3 */
 /* 4 */    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* 4 */
 /* 5 */    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* 5 */

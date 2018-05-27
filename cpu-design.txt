@@ -74,8 +74,8 @@ Instructions Summary
 0x25 |  BNZ  | Branch if zero flag not set
 0x26 |  BGT  | Branch if negative flag not set
 0x27 |  BLZ  | Branch if negative flag set
-0X28 |  BOF  | Branch if overflow flag set
-0X29 |  BOU  | Branch if underflow flag set
+0X28 |  BOF  | Branch if overflow flag set (cancel this for now)
+0X29 |  BOU  | Branch if underflow flag set (cancel this for now)
 0X2A |  CLF  | Clear flags
 0x2B |  JMP  | Unconditional jump
 0x2C |  INT  | Interrupt

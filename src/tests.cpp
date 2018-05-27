@@ -178,6 +178,36 @@ void test_beq(cpu *c) {
     cpu_print_status(c);
 }
 
+void test_bnz(cpu *c) {
+    reset(c);
+    c->instr->value = 15;
+    c->flags = 0;
+    c->pc = 5;
+    bnz(c);
+    assert(15 == c->pc);
+    cpu_print_status(c);
+}
+
+void test_bgt(cpu *c) {
+    reset(c);
+    c->instr->value = 12;
+    c->flags = 0;
+    c->pc = 5;
+    bgt(c);
+    assert(12 == c->pc);
+    cpu_print_status(c);
+}
+
+void test_blz(cpu *c) {
+    reset(c);
+    c->instr->value = 17;
+    c->flags = 2; // equivalent to 1 << 1 or 00000010
+    c->pc = 5;
+    blz(c);
+    assert(17 == c->pc);
+    cpu_print_status(c);
+}
+
 int main() {
     cpu *c = (cpu*)malloc(sizeof(cpu));
     cpu_init(c);
@@ -210,6 +240,9 @@ int main() {
     // test jump opcodes
     test_jmp(c);
     test_beq(c);
+    test_bnz(c);
+    test_bgt(c);
+    test_blz(c);
     printf("all test passed");
 
     return 0;
