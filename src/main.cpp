@@ -11,23 +11,45 @@ You should have received a copy of the GNU General Public License along with thi
 #include <cstdlib>
 #include <cassert>
 #include "cpu.h"
+i64 MakeInstruction(i64 op, i64 dst, i64 src) { 
+	i64 instr = op << 56; 
+	instr = instr | (dst << 48);
+	instr = instr | (src & ADDR_MASK);
+	return instr;
+}
 
 int main() {
-    cpu *c = (cpu*)malloc(sizeof(cpu));
-    cpu_init(c);
-    byte memory[] = {
-        0x01,   // sia
-        0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x02,   // sib
-        0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x16,   // add
-        0x2E    // hlt
-    };
-    c->mem = memory;
+	Cpu *c = new_cpu();
+	i64 memory[] = {
+		// load 3 and 4
+		MakeInstruction(LDI, 0, 3),
+		MakeInstruction(LDI, 1, 4),
+
+		// add 3 and 4 
+		MakeInstruction(ADD, 0, 1),
+
+		// sub 5 from 7
+		MakeInstruction(LDI, 2, 5),
+		MakeInstruction(SUB, 0, 2),
+
+		// mul 2 by 8
+		MakeInstruction(LDI, 2, 8),
+		MakeInstruction(MUL, 0, 2),
+
+		// div 16 by 3
+		MakeInstruction(LDI, 2, 3),
+		MakeInstruction(DIV, 0, 2),
+
+		// mod 5 2
+		MakeInstruction(LDI, 2, 2),
+		MakeInstruction(MOD, 0, 2),
+
+		MakeInstruction(HLT, 0, 0)
+	};
+    c->mem = (byte*)memory;
 
     run(c);
 
-    cpu_print_status(c);
-
+	printf("reg0:%I64d\n", c->reg[0]);
     return 0;
 }

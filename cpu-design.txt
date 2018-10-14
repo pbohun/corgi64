@@ -12,15 +12,12 @@ Registers
 -----------+-----------------------------------------
 Identifier | Description
 -----------+-----------------------------------------
-     A     | Accumulator
-     B     | General register
-     C     | General register
-     PC    | Program counter 
-     SP    | Stack pointer
-     F     | Flags
+    reg    | arithmetic and logic registers (0-8)
+    pc     | Program counter 
+    sp     | Stack pointer
+    f      | Flags
 
-- All bitwise and arithmetic operations store the result in register A.
-- All bitwise and arithmetic operations are between registers A and B.
+
 - All registers are 64 bits wide
 
 Flags Summary 
@@ -30,56 +27,16 @@ Bit | Description
  0  | zero
  1  | negative
 
+
 Instructions Summary
 --- Opcodes --------------------------------------------
  Val |  Name | Description
 -----+-------+------------------------------------------
-0X00 |   -   | Reserved
-0x01 |  SIA  | Sets register A to immediate value
-0X02 |  SIB  | Sets register B to immediate value
-0x03 |  SIC  | Sets register C to immediate value
-0x04 |  LDA  | Sets register A to value at address
-0X05 |  LDB  | Sets register B to value at address
-0X06 |  LDC  | Sets register C to value at address
-0x07 |  STA  | Sets value at address from register A
-0x08 |  STB  | Sets value at address from register B
-0x09 |  STC  | Sets value at address from register C
-0x0A |  PSA  | Push register A to stack
-0x0B |  PSB  | Push register B to stack
-0x0C |  PSC  | Push register C to stack
-0X0D |  POA  | Pop stack to register A
-0x0E |  POB  | Pop stack to register B
-0x0F |  POC  | Pop stack to register C
-0x10 |  MAB  | Copy value from register A to register B
-0X11 |  MAC  | Copy value from register A to register C
-0X12 |  MBA  | Copy value from register B to register A
-0X13 |  MBC  | Copy value from register B to register C
-0X14 |  MCA  | Copy value from register C to register A
-0X15 |  MCB  | Copy value from register C to register B
-0x16 |  ADD  | Add
-0x17 |  SUB  | Subtract
-0x18 |  MUL  | Multiply
-0x19 |  DIV  | Divide
-0x1A |  MOD  | Modulus
-0X1B |  INC  | Increment register
-0X1C |  DEC  | Decrement register
-0x1D |  AND  | Bitwise and
-0x1E |  BOR  | Bitwise or
-0x1F |  XOR  | Bitwise xor
-0x20 |  SHR  | Bit shift right
-0x21 |  SHL  | Bit shift left
-0x22 |  JSR  | Jump to subroutine
-0X23 |  RET  | Return from subroutine
-0x24 |  BEQ  | Branch if zero flag set
-0x25 |  BNZ  | Branch if zero flag not set
-0x26 |  BGT  | Branch if negative flag not set
-0x27 |  BLZ  | Branch if negative flag set
-0X28 |  BOF  | Branch if overflow flag set (cancel this for now)
-0X29 |  BOU  | Branch if underflow flag set (cancel this for now)
-0X2A |  CLF  | Clear flags
-0x2B |  JMP  | Unconditional jump
-0x2C |  INT  | Interrupt
-0X2D |  NOP  | No operation
-0X2E |  HLT  | Halt operation
+0x00 |  LDI  | Load immediate value 
+0x01 |  ADD  | Add dst to src 
+0x02 |  SUB  | Sub dst to src 
+0x03 |  MUL  | Mul dst to src 
+0x04 |  DIV  | Div dst to src 
+0x05 |  MOD  | Mod dst to src 
+0x06 |  HLT  | Halt cpu 
 
-Instruction Details 

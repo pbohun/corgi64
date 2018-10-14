@@ -7,219 +7,75 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 
 You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
-#include <cstdint>
+#include <stdint.h>
 
-using byte = uint8_t;
-using i64 = int64_t;
+#define DEST_MASK 0x00FF000000000000
+#define ADDR_MASK 0x0000FFFFFFFFFFFF
+#define byte uint8_t
+#define i64 int64_t
 
-struct instruction {
-    byte opcode;
-    i64 value;
+enum OPS {
+	LDI, ADD, SUB, MUL, DIV, MOD, HLT
 };
 
-struct cpu {
-    i64 a, b, c, pc, sp, flags;
-    instruction *instr;
+// instruction 64 bits total
+// 8 bits : opcode
+// 8 bits : destination register
+// 48 bits : source register / immediate value
+
+typedef struct {
+	i64 reg[8];
+    i64 pc, sp, flags;
     bool running;
     byte *mem;
-};
+} Cpu;
 
-void cpu_fetch(cpu *c) {
-    c->instr->opcode = *(c->mem + c->pc);
-    c->instr->value = *(i64*)(c->mem + c->pc + 1);
+Cpu *new_cpu() {
+	Cpu *c = (Cpu*)malloc(sizeof(Cpu));
+	c->mem = (byte*)malloc(sizeof(byte) * 8000);
+	c->pc = 0;
+	c->sp = 8000;
+	c->flags = 0;
+	return c;
 }
 
-void cpu_print_status(cpu *c) {
-    printf("a: %lld\nb: %lld\nc: %lld\npc: %lld\nsp: %lld\nflags: %lld\n",
-        c->a, c->b, c->c, c->pc, c->sp, c->flags);
-}
-
-i64 get_flag_value(cpu *c, int flag_index) {
-    i64 mask = 1 << flag_index;
-    return (c->flags & mask) >> flag_index;
-}
-
-void nop(cpu *c) {}
-
-void hlt(cpu *c) {
-    c->running = false;
-}
-
-void set_arithmetic_flag(cpu *c) {
-    if (c->a == 0) {
-        c->flags |= 1;
-    } else if (c->a < 0) {
-        c->flags |= 2;
-    } else if (c->a > 0) {
-        c->flags &= ~2;
-    }
-}
-
-void add(cpu *c) {
-    c->a = c->a + c->b;
-    set_arithmetic_flag(c);
-}
-
-void sub(cpu *c) {
-    c->a = c->a - c->b;
-    set_arithmetic_flag(c);
-}
-
-void mul(cpu *c) {
-    c->a = c->a * c->b;
-    set_arithmetic_flag(c);
-}
-
-void div(cpu *c) {
-    c->a = c->a / c->b;
-    set_arithmetic_flag(c);
-}
-
-void mod(cpu *c) {
-    c->a = c->a % c->b;
-    set_arithmetic_flag(c);
-}
-
-// register opcodes
-void sia(cpu *c) {
-    c->a = c->instr->value;
-}
-
-void sib(cpu *c) {
-    c->b = c->instr->value;
-}
-
-void sic(cpu *c) {
-    c->c = c->instr->value;
-}
-
-// memory opcodes
-void lda(cpu *c) {
-    c->a = *(i64*)(c->mem + c->instr->value);
-}
-
-void ldb(cpu *c) {
-    c->b = *(i64*)(c->mem + c->instr->value);
-}
-
-void ldc(cpu *c) {
-    c->c = *(i64*)(c->mem + c->instr->value);
-}
-
-void sta(cpu *c) {
-    *(i64*)(c->mem + c->instr->value) = c->a;
-}
-
-void stb(cpu *c) {
-    *(i64*)(c->mem + c->instr->value) = c->b;
-}
-
-void stc(cpu *c) {
-    *(i64*)(c->mem + c->instr->value) = c->c;
-}
-
-// jump opcodes 
-void jmp(cpu *c) {
-    c->pc = c->instr->value;
-}
-
-void beq(cpu *c) {
-    if (get_flag_value(c, 0) == 1) {
-        c->pc = c->instr->value;
-    }
-}
-
-void bnz(cpu *c) {
-    if (get_flag_value(c, 0) == 0) {
-        c->pc = c->instr->value;
-    }
-}
-
-void bgt(cpu *c) {
-    if (get_flag_value(c, 1) == 0) {
-        c->pc = c->instr->value;
-    }
-}
-
-void blz(cpu *c) {
-    if (get_flag_value(c, 1) == 1) {
-        c->pc = c->instr->value;
-    }
-}
-
-// table of opcodes
-void (*optable[256])(cpu*) = {
-/*      | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | A | B | C | D | E | F |      */
-/* 0 */  nop,sia,sib,sic,lda,ldb,ldc,sta,stb,stc,nop,nop,nop,nop,nop,nop, /* 0 */
-/* 1 */  nop,nop,nop,nop,nop,nop,add,sub,mul,div,mod,nop,nop,nop,nop,nop, /* 1 */
-/* 2 */  nop,nop,nop,nop,beq,nop,bgt,blz,nop,nop,nop,jmp,nop,nop,hlt,nop, /* 2 */
-/* 3 */  nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop, /* 3 */
-/* 4 */  nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop, /* 4 */
-/* 5 */  nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop, /* 5 */
-/* 6 */  nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop, /* 6 */
-/* 7 */  nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop, /* 7 */
-/* 8 */  nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop, /* 8 */
-/* 9 */  nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop, /* 9 */
-/* A */  nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop, /* A */
-/* B */  nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop, /* B */
-/* C */  nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop, /* C */
-/* D */  nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop, /* D */
-/* E */  nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop, /* E */
-/* F */  nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop, /* F */
-};
-
-// table of memory offsets
-i64 offset_table[256] = {
-/*      | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | A | B | C | D | E | F |      */
-/* 0 */    1,  9,  9,  9,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* 0 */
-/* 1 */    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* 1 */
-/* 2 */    1,  1,  1,  1,  9,  1,  9,  9,  1,  1,  1,  9,  1,  1,  1,  1, /* 2 */
-/* 3 */    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* 3 */
-/* 4 */    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* 4 */
-/* 5 */    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* 5 */
-/* 6 */    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* 6 */
-/* 7 */    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* 7 */
-/* 8 */    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* 8 */
-/* 9 */    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* 9 */
-/* A */    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* A */
-/* B */    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* B */
-/* C */    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* C */
-/* D */    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* D */
-/* E */    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* E */
-/* F */    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, /* F */
-};
-
-void cpu_init(cpu *c) {
-    c->a = 0;
-    c->b = 0;
-    c->c = 0;
-    c->pc = 0;
-    c->sp = 0;
-    c->flags = 0;
-    c->mem = NULL;
-    c->instr = (instruction*)malloc(sizeof(instruction));
-}
-
-void reset(cpu *c) {
-    c->a = 0;
-    c->b = 0;
-    c->c = 0;
-    c->pc = 0;
-    c->sp = 0;
-    c->flags = 0;
-    if (c->instr == NULL) {
-        c->instr = (instruction*)malloc(sizeof(instruction));
-    }
-}
-
-void run(cpu *c) {
+void run(Cpu *c) {
     c->running = true;
     while(c->running) {
-        // fetch and decode
-        cpu_fetch(c);
-        // increment the program counter
-        c->pc += offset_table[c->instr->opcode];
-        // execute
-        optable[c->instr->opcode](c);
+		i64 *mem = (i64*)c->mem;
+		i64 instr = mem[c->pc];
+		i64 op = (uint64_t)instr >> 56;
+		i64 dst = (instr & DEST_MASK) >> 48;
+		i64 src = instr & ADDR_MASK;
+
+		printf("op:%I64d, dst:%I64d, src:%I64d\n", op, dst, src);
+
+		switch (op) {
+		case LDI:
+			c->reg[dst] = src;
+			break;
+		case ADD:
+			c->reg[dst] += c->reg[src];
+			break;
+		case SUB:
+			c->reg[dst] -= c->reg[src];
+			break;
+		case MUL:
+			c->reg[dst] *= c->reg[src];
+			break;
+		case DIV:
+			c->reg[dst] /= c->reg[src];
+			break;
+		case MOD:
+			c->reg[dst] %= c->reg[src];
+			break;
+		case HLT:
+			c->running = false;
+			break;
+		default:
+			printf("Unknown opcode:%I64d\n", op);
+			exit(0);		
+		}
+		c->pc++;
     }
 }
