@@ -33,10 +33,13 @@ Instructions Summary
  Val |  Name | Description
 -----+-------+------------------------------------------
 0x00 |  LDI  | Load immediate value 
-0x01 |  ADD  | Add dst to src 
-0x02 |  SUB  | Sub dst to src 
-0x03 |  MUL  | Mul dst to src 
-0x04 |  DIV  | Div dst to src 
-0x05 |  MOD  | Mod dst to src 
-0x06 |  HLT  | Halt cpu 
+0x01 |  LD   | Load 64 bit value from memory 
+0x02 |  ST   | Store 64 bit value into memory 
+0x03 |  ADD  | Add dst to src 
+0x04 |  SUB  | Sub dst to src 
+0x05 |  MUL  | Mul dst to src 
+0x06 |  DIV  | Div dst to src 
+0x07 |  MOD  | Mod dst to src 
+0x08 |  JMP  | Jump unconditionally
+0x09 |  HLT  | Halt cpu 
 
