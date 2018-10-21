@@ -48,7 +48,7 @@ void run(Cpu *c) {
 		i64 dst = (instr & DEST_MASK) >> 48;
 		i64 src = instr & ADDR_MASK;
 
-		printf("op:%I64d, dst:%I64d, src:%I64d\n", op, dst, src);
+		printf("op:%ld, dst:%ld, src:%ld\n", op, dst, src);
 
 		switch (op) {
 		case LDI:
@@ -73,7 +73,7 @@ void run(Cpu *c) {
 			c->running = false;
 			break;
 		default:
-			printf("Unknown opcode:%lld\n", op);
+			printf("Unknown opcode:%ld\n", op);
 			exit(0);		
 		}
 		c->pc++;
