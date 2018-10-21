@@ -50,6 +50,6 @@ int main() {
 
     run(c);
 
-	printf("reg0:%I64d\n", c->reg[0]);
+	printf("reg0:%lld\n", c->reg[0]);
     return 0;
 }

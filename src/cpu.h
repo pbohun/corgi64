@@ -73,7 +73,7 @@ void run(Cpu *c) {
 			c->running = false;
 			break;
 		default:
-			printf("Unknown opcode:%I64d\n", op);
+			printf("Unknown opcode:%lld\n", op);
 			exit(0);		
 		}
 		c->pc++;
