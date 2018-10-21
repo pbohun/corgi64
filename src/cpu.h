@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License along with thi
 #define i64 int64_t
 
 enum OPS {
-	LDI, ADD, SUB, MUL, DIV, MOD, HLT
+	LDI, LD, ST, ADD, SUB, MUL, DIV, MOD, JMP, HLT
 };
 
 // instruction 64 bits total
@@ -54,6 +54,19 @@ void run(Cpu *c) {
 		case LDI:
 			c->reg[dst] = src;
 			break;
+		case LD:
+			if (src < 8) {
+				c->reg[dst] = mem[c->reg[src]];
+			} else {
+				c->reg[dst] = mem[src];
+			}
+			break;
+		case ST:
+			if (src < 8) {
+				mem[c->reg[dst]] = c->reg[src];
+			} else {
+				mem[dst] = c->reg[src];
+			}break;
 		case ADD:
 			c->reg[dst] += c->reg[src];
 			break;
@@ -68,6 +81,9 @@ void run(Cpu *c) {
 			break;
 		case MOD:
 			c->reg[dst] %= c->reg[src];
+			break;
+		case JMP:
+			c->pc = src - 1;
 			break;
 		case HLT:
 			c->running = false;

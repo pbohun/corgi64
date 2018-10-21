@@ -21,6 +21,16 @@ i64 MakeInstruction(i64 op, i64 dst, i64 src) {
 int main() {
 	Cpu *c = new_cpu();
 	i64 memory[] = {
+		MakeInstruction(LDI, 0, 5),
+		MakeInstruction(LDI, 1, 10),
+		MakeInstruction(ST, 1, 0),
+		MakeInstruction(LD, 2, 1),
+		MakeInstruction(JMP, 0, 6),
+		MakeInstruction(ADD, 1, 2),
+		MakeInstruction(HLT, 0, 0)
+	};
+	/*
+	i64 memory[] = {
 		// load 3 and 4
 		MakeInstruction(LDI, 0, 3),
 		MakeInstruction(LDI, 1, 4),
@@ -46,10 +56,11 @@ int main() {
 
 		MakeInstruction(HLT, 0, 0)
 	};
+	*/
     c->mem = (byte*)memory;
 
     run(c);
 
-	printf("reg0:%I64d\n", c->reg[0]);
+	printf("reg2:%I64d\n", c->reg[2]);
     return 0;
 }
