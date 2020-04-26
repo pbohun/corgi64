@@ -25,7 +25,7 @@ int main() {
 		MakeInstruction(LDI, 1, 10),
 		MakeInstruction(ST, 1, 0),
 		MakeInstruction(LD, 2, 1),
-		MakeInstruction(JMP, 0, 6),
+		MakeInstruction(JRO, 2, 0),
 		MakeInstruction(ADD, 1, 2),
 		MakeInstruction(HLT, 0, 0)
 	};

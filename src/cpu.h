@@ -15,7 +15,11 @@ You should have received a copy of the GNU General Public License along with thi
 #define i64 int64_t
 
 enum OPS {
-	LDI, LD, ST, ADD, SUB, MUL, DIV, MOD, JMP, HLT
+	LDI, LD, ST, ADD, SUB, MUL, DIV, MOD, JMP, JRO, HLT
+};
+
+char *op_strings[] = {
+	"LDI", "LD", "ST", "ADD", "SUB", "MUL", "DIV", "MOD", "JMP", "JRO", "HLT"
 };
 
 // instruction 64 bits total
@@ -48,7 +52,7 @@ void run(Cpu *c) {
 		i64 dst = (instr & DEST_MASK) >> 48;
 		i64 src = instr & ADDR_MASK;
 
-		printf("op:%I64d, dst:%I64d, src:%I64d\n", op, dst, src);
+		printf("op:%s, dst:%I64d, src:%I64d\n", op_strings[op], dst, src);
 
 		switch (op) {
 		case LDI:
@@ -84,6 +88,9 @@ void run(Cpu *c) {
 			break;
 		case JMP:
 			c->pc = src - 1;
+			break;
+		case JRO:
+			c->pc += src;
 			break;
 		case HLT:
 			c->running = false;

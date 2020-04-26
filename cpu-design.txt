@@ -41,5 +41,6 @@ Instructions Summary
 0x06 |  DIV  | Div dst to src 
 0x07 |  MOD  | Mod dst to src 
 0x08 |  JMP  | Jump unconditionally
-0x09 |  HLT  | Halt cpu 
+0x09 |  JRO  | Jump relative offset
+0x0A |  HLT  | Halt cpu 
 

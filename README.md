@@ -15,6 +15,8 @@ Because I wanted this system to be as simple as possible I've only targeted one 
 
 To compile Corgi64, you'll need the c++ compiler offered by Microsoft Visual Studio. You can acquire a free version here: https://www.visualstudio.com/vs/community/
 
+Alternatively, Corgi64 should be able to compile with gcc offered through MinGW or Cygwin.
+
 ## Compiling and Running 
 To compile Corgi64, run the following command within the main directory:  
 `build.bat`
